@@ -1,6 +1,6 @@
 # Adobe Analytics Website Scanner
 
-A FastAPI application that scans websites for Adobe Analytics implementation, detecting Adobe Launch/DTM tagging and capturing network beacons on page load and user interactions.
+A FastAPI application that scans websites for Adobe Analytics implementation, detecting Adobe Launch/DTM tagging and capturing network beacons on page load and user interactions using Selenium WebDriver.
 
 ## Features
 
@@ -9,6 +9,7 @@ A FastAPI application that scans websites for Adobe Analytics implementation, de
 - **Interactive Testing**: Clicks links and buttons to capture interaction-triggered beacons
 - **Excel Reports**: Generates downloadable reports with all findings
 - **Background Processing**: Scans run asynchronously with status tracking
+- **MongoDB Storage**: Persistent report storage for fast retrieval
 
 ## Quick Start
 
@@ -17,8 +18,6 @@ A FastAPI application that scans websites for Adobe Analytics implementation, de
 1. Install dependencies:
 ```bash
 pip install -r requirements.txt
-playwright install-deps
-playwright install chromium
 ```
 
 2. Start the server:
@@ -32,7 +31,7 @@ uvicorn main:app --reload
 
 **Start a scan:**
 ```bash
-curl -X POST "http://localhost:8001/scan?start_url=https://www.homedepot.ca&max_pages=5&max_clicks_per_page=3"
+curl -X POST "http://localhost:8001/scan?start_url=https://www.adobe.com&max_pages=5&max_clicks_per_page=3"
 ```
 
 **Check scan status:**
@@ -50,19 +49,33 @@ curl "http://localhost:8001/report/{scan_id}/data"
 curl "http://localhost:8001/report/{scan_id}" -o report.xlsx
 ```
 
-## Deployment on Render.com (Free Tier)
+## Deployment Options
 
-1. **Create Web Service**: Connect your GitHub repository
-2. **Build Command**: 
-   ```
-   pip install -r requirements.txt && playwright install-deps && playwright install chromium
-   ```
-3. **Start Command**: 
-   ```
-   uvicorn main:app --host 0.0.0.0 --port $PORT
-   ```
-4. **Environment Variables**: 
-   - `MONGO_URI`: Your MongoDB Atlas connection string
+### 🚀 Render.com Deployment
+
+**Build Command**: `pip install -r requirements.txt`  
+**Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`  
+**Environment Variable**: `MONGO_URI` with your MongoDB connection string
+
+✅ **Selenium WebDriver** automatically manages Chrome browser installation  
+✅ **webdriver-manager** handles driver compatibility  
+✅ **Full dynamic analysis** with beacon capture and interaction testing
+
+### � Ddocker Deployment
+
+```bash
+docker build -t adobe-scanner .
+docker run -p 80:8000 -e MONGO_URI="your_mongo_uri" adobe-scanner
+```
+
+### 💻 Local Development
+
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+Chrome browser will be automatically managed by webdriver-manager.
 
 ## MongoDB Atlas Setup
 
@@ -97,7 +110,8 @@ The Excel report includes:
 ## Architecture
 
 - **FastAPI**: REST API framework
-- **Playwright**: Headless browser automation for accurate beacon detection
+- **Selenium WebDriver**: Headless browser automation for accurate beacon detection
+- **webdriver-manager**: Automatic Chrome driver management
 - **MongoDB Atlas**: Cloud database for scan data storage
 - **Pandas + OpenPyXL**: Excel report generation
 - **BeautifulSoup + Requests**: Lightweight URL collection

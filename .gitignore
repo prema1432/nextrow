@@ -190,8 +190,12 @@ $RECYCLE.BIN/
 test_report_*.xlsx
 report_*.xlsx
 
-# Playwright browsers
+# Selenium/WebDriver
 /ms-playwright/
+chromedriver*
+geckodriver*
+
+# Docker
 
 # Log files
 *.log
